@@ -5,7 +5,7 @@ A comics aggregator that is meant to be run as a [CloudFlare Worker](https://wor
 Based on the [Worker Typescript Template](https://github.com/cloudflare/worker-typescript-template). The documentation below is an edited version of what was included
 with the template.
 
-## Note: You must use [wrangler](https://developers.cloudflare.com/workers/cli-wrangler/install-update) 2.x
+## Note: You must use [wrangler](https://developers.cloudflare.com/workers/cli-wrangler/install-update) 3.x
 
 ## 🔋 Getting Started
 
