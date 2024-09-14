@@ -1,5 +1,13 @@
 import { ComicDefinition, DirectUrlComic, NavigateParseComic, ParseComic, singleImage, singleImageWithTitle } from './comic'
 
+class DagbladetComic extends ParseComic {
+  constructor(name: string) {
+    super(name, "https://www.dagbladet.no/tegneserie", ($) => {
+      return singleImage($('img', $(`article.comic:contains("${name}")`)).attr('src')); 
+    })
+  }
+}
+
 export var comicDefinitions: ComicDefinition[] = [
   new DirectUrlComic('Lunch', 'https://e24.no', (_) => {
     const now = new Date().toISOString()
@@ -54,10 +62,11 @@ export var comicDefinitions: ComicDefinition[] = [
     }
   }),
   new ParseComic('War and Peas', 'https://warandpeas.com/', ($) => {
-    return singleImage($('div.entry-content img').attr('src')); 
+    // There's little to go by in the structure to identify the correct image, but we try our best...
+    return singleImage($('div.entry-content img', $('article.tag-webcomic').first()).last().attr('data-orig-file')); 
   }),
   new ParseComic('Poorly Drawn Lines', 'https://poorlydrawnlines.com/', ($) => {
-    return singleImage($('div.wp-block-image img').attr('src')); 
+    return singleImage($('div.entry-content img').attr('data-src')); 
   }),
   new ParseComic('ToonHole', 'https://toonhole.com/', ($) => {
     return singleImage($('img.wp-post-image').attr('src')); 
@@ -68,5 +77,10 @@ export var comicDefinitions: ComicDefinition[] = [
     },
     ($) => {
       return singleImage($('picture img').attr('src')?.replace("w_120,", "w_800,"));
-    })
+    }),
+  new DagbladetComic("Gutta på gølvet"),
+  new DagbladetComic("Rutetid"),
+  new DagbladetComic("Hurtigmat"),
+  new DagbladetComic("Flisespikkeri"),
+  new DagbladetComic("Ting jeg gjorde"),
 ]
