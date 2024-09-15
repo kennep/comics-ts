@@ -5,6 +5,7 @@ export type Comic = {
   name: string
   linkUrl: string
   data: ComicData
+  updated: number
 }
 
 export type ComicMedia = {
@@ -106,6 +107,7 @@ export abstract class ComicDefinition {
         name: this.name,
         linkUrl: this.linkUrl,
         data: fixup(this.linkUrl, comicData),
+        updated: new Date().getTime()
       }
     } catch (e: any) {
       return {
@@ -115,6 +117,7 @@ export abstract class ComicDefinition {
           media: [],
           errors: [e.toString()],
         },
+        updated: new Date().getTime()
       }
     }
   }
@@ -157,10 +160,10 @@ export class LoadedUrlComic extends ComicDefinition {
   async loadComicData(linkUrl: string): Promise<ComicData> {
     const response = await this.fetchWithTimeout(linkUrl)
 
-    if (response.status != 200) {
-      throw new Error(`Failed getting ${this.name}: 'HTTP ${response.status}`)
-    }
     const body = await response.text()
+    if (response.status != 200) {
+      throw new Error(`Failed getting ${this.name}: HTTP ${response.status}: ${body}`)
+    }
 
     return this.comicFactory(body)
   }

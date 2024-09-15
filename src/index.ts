@@ -1,5 +1,9 @@
-import { handleComicsRequest, handleComicRequest } from './comics_endpoint'
+import { handleComicsRequest, handleComicRequest, handleScheduled } from './comics_endpoint'
 import { getAssetFromKV } from '@cloudflare/kv-asset-handler'
+
+declare global {
+  var comicsKv: KVNamespace
+}
 
 addEventListener('fetch', (evt) => {
   const event = evt as FetchEvent
@@ -8,7 +12,7 @@ addEventListener('fetch', (evt) => {
     event.respondWith(handleComicsRequest(event.request))
   } else if(pathname.startsWith("/comics/")) {
     const comicName = decodeURIComponent(pathname.substring("/comics/".length))
-    event.respondWith(handleComicRequest(event.request, comicName))
+    event.respondWith(handleComicRequest(event.request, comicName, comicsKv))
   } else {
     event.respondWith(handleStatic(event))
   }
@@ -25,3 +29,9 @@ async function handleStatic(event: any) {
     })
   }
 }
+
+addEventListener('scheduled', (evt) => {
+  console.log("Scheduled event")
+  const event = evt as ScheduledEvent
+  event.waitUntil(handleScheduled(comicsKv))
+})
