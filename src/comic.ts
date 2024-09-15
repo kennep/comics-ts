@@ -209,10 +209,10 @@ export class NavigateParseComic extends ParseComic {
   async loadComicData(linkUrl: string): Promise<ComicData> {
     const response = await this.fetchWithTimeout(linkUrl);
 
-    if (response.status != 200) {
-      throw new Error(`Failed getting ${this.name}: 'HTTP ${response.status}`)
-    }
     const body = await response.text()
+    if (response.status != 200) {
+      throw new Error(`Failed getting ${this.name}: HTTP ${response.status}: ${body}`)
+    }
     const doc = load(body, {xmlMode: false, scriptingEnabled: false});
     const targetUrl = this.targetSelector(doc);
     if(!targetUrl) {
