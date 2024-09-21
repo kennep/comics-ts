@@ -17,7 +17,7 @@ export async function handleComicRequest(request: Request, comicName: string, co
 
   const comicKvKey = `${comicName}.json`
   const comicInKv: Comic | null = await comicsKV.get(comicKvKey, "json")
-  if(comicInKv != null && isUpToDate(comicInKv)) {
+  if(comicInKv != null && isUpToDate(comicInKv, 12, 0)) {
     return new Response(JSON.stringify(comicInKv))
   }
 
@@ -28,8 +28,11 @@ export async function handleComicRequest(request: Request, comicName: string, co
   return new Response(stringifiedComic)
 }
 
-function isUpToDate(comicInKv: Comic, jitter: number = 0): boolean {
-  return (new Date().getTime() - comicInKv.updated) < (3600000 + Math.random() * jitter);
+function isUpToDate(comicInKv: Comic, hours:number, minutes:number, jitterSecs: number = 0): boolean {
+  if(comicInKv.data.errors != null && comicInKv.data.errors.length >= 0) {
+    return (new Date().getTime() - comicInKv.updated) < 3600000;
+  }
+  return (new Date().getTime() - comicInKv.updated) < (hours*3600000 + minutes*60000+ Math.random() * jitterSecs * 1000);
 }
 
 export async function handleScheduled(comicsKV: KVNamespace): Promise<void> {
@@ -39,7 +42,7 @@ export async function handleScheduled(comicsKV: KVNamespace): Promise<void> {
     const comicKvKey = `${comicDefinition.name}.json`
     const comicInKv: Comic | null = await comicsKV.get(comicKvKey, "json")
 
-    if(comicInKv != null && isUpToDate(comicInKv, 1800000)) {
+    if(comicInKv != null && isUpToDate(comicInKv, 6, 0, 1800)) {
       return;
     }
 
