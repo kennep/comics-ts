@@ -15,4 +15,4 @@ binding = "comicsKv"
 id = "f2794c1d4ee244a0aab2bd9fcbf46efe"
 
 [triggers]
-crons = ["*/60 * * * *"]
+crons = ["0 */1 * * *"]
