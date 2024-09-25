@@ -49,6 +49,9 @@ async function getAndUpdateComics(comicsKv: KVNamespace, upToDateCheck: (c: Comi
     }
   }))
 
+  const comicNames = comicDefinitions.map(c => c.name)
+  Object.keys(comics).filter(c => !comicNames.includes(c)).forEach(c => delete comics[c])
+
   if(updated.some(u => u)) {
     console.log("Saving updated comics")
     await comicsKv.put(comicKvKey, JSON.stringify(comics))
