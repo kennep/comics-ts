@@ -30,10 +30,8 @@ window.addEventListener('load', async function () {
             throw new Error(`HTTP ${comicsResponse.status}`)
         }
 
-        let comicsList = await comicsResponse.json()
-        let comics: Array<Comic> = await Promise.all(
-            comicsList.map(async (comicName: string) => 
-                (await fetch('/comics/' + encodeURIComponent(comicName))).json()))
+        let comicsMap = await comicsResponse.json()
+        let comics: Array<Comic> = Array.from(Object.values(comicsMap))
         hideLoad()
         updateLocalComicsTimestamp(comics)
         comics.sort((a, b) => b.firstSeen - a.firstSeen)

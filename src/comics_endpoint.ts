@@ -1,31 +1,14 @@
 import { comicDefinitions } from './comics'
 import { Comic } from './comic'
 
-export async function handleComicsRequest(request: Request): Promise<Response> {
-  const comics = comicDefinitions.map((c) => c.name)
+const comicKvKey = "comics.json"
+
+type Comics = {[key:string]: Comic}
+
+export async function handleComicsRequest(request: Request, comicsKV: KVNamespace): Promise<Response> {
+  const comics = await getAndUpdateComics(comicsKv, c => isUpToDate(c, 12, 0))
 
   return new Response(JSON.stringify(comics))
-}
-
-
-export async function handleComicRequest(request: Request, comicName: string, comicsKV: KVNamespace): Promise<Response> {
-  const matchingComics = comicDefinitions.filter(c => c.name == comicName)
-  if(matchingComics.length == 0)
-  {
-    return new Response("comic not found",  {status: 404})
-  }
-
-  const comicKvKey = `${comicName}.json`
-  const comicInKv: Comic | null = await comicsKV.get(comicKvKey, "json")
-  if(comicInKv != null && isUpToDate(comicInKv, 12, 0)) {
-    return new Response(JSON.stringify(comicInKv))
-  }
-
-  const comic = await matchingComics[0].getComic()
-  const stringifiedComic = JSON.stringify(comic)
-  await comicsKV.put(comicKvKey, stringifiedComic)
-
-  return new Response(stringifiedComic)
 }
 
 function isUpToDate(comicInKv: Comic, hours:number, minutes:number, jitterSecs: number = 0): boolean {
@@ -37,24 +20,39 @@ function isUpToDate(comicInKv: Comic, hours:number, minutes:number, jitterSecs: 
 
 export async function handleScheduled(comicsKV: KVNamespace): Promise<void> {
   console.log("Running scheduled function")
-  
-  await Promise.all(comicDefinitions.map(async comicDefinition => {
-    const comicKvKey = `${comicDefinition.name}.json`
-    const comicInKv: Comic | null = await comicsKV.get(comicKvKey, "json")
 
-    if(comicInKv != null && isUpToDate(comicInKv, 6, 0, 1800)) {
-      return;
+  await getAndUpdateComics(comicsKv, c => isUpToDate(c, 6, 0, 1800))
+}
+
+async function getAndUpdateComics(comicsKv: KVNamespace, upToDateCheck: (c: Comic) => boolean): Promise<Comics> {
+  const comics: Comics = await comicsKv.get(comicKvKey, "json") ?? {}
+
+  const updated = await Promise.all(comicDefinitions.map(async comicDefinition => {
+    const comicInKv = comics[comicDefinition.name] ?? null
+
+    if(comicInKv != null && upToDateCheck(comicInKv)) {
+      console.log(`Up to date: ${comicDefinition.name}`)
+      return false
     }
 
     console.log(`Loading comic: ${comicDefinition.name}`)
     try {
+      console.log(`Start loading comic: ${comicDefinition.name}`)
       const comic = await comicDefinition.getComic()
-      await comicsKv.put(comicKvKey, JSON.stringify(comic))  
+      comics[comicDefinition.name] = comic
       console.log(`Done loading comic: ${comicDefinition.name}`)
+      return true
     }
     catch(e: any) {
       console.error(`Error while loading comic ${comicDefinition.name}: ${e}\n${e.stack}`)
-      return
+      return false
     }
   }))
+
+  if(updated.some(u => u)) {
+    console.log("Saving updated comics")
+    await comicsKv.put(comicKvKey, JSON.stringify(comics))
+  }
+
+  return comics
 }
