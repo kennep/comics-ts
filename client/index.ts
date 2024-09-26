@@ -143,7 +143,7 @@ async function reload(comic: Comic) : Promise<boolean> {
     div.className = "loading"
     div.innerHTML = "<progress>Loading...</progress>"
     placeholder.appendChild(div)
-    placeholder.style.height = elementToReplace.offsetHeight + "px"
+    placeholder.style.minHeight = elementToReplace.offsetHeight + "px"
 
     elementToReplace.replaceWith(placeholder)
 
