@@ -7,8 +7,30 @@ type Comics = {[key:string]: Comic}
 
 export async function handleComicsRequest(request: Request, comicsKV: KVNamespace): Promise<Response> {
   const comics = await getAndUpdateComics(comicsKv, c => isUpToDate(c, 12, 0))
+  let comicsArray: Array<Comic> = Array.from(Object.values(comics))
 
-  return new Response(JSON.stringify(comics))
+  return new Response(JSON.stringify(comicsArray))
+}
+
+export async function handleComicRequest(request: Request, comicName: string, comicsKV: KVNamespace) : Promise<Response> {
+  const comicDefinition = comicDefinitions.find(c => c.name == comicName)
+  if(comicDefinition == null)
+  {
+    return new Response(JSON.stringify({
+      name: comicName,
+      data: {
+        errors: [comicName + ": not found"]
+      }
+    } as Comic))
+  }
+
+  const comics: Comics = await comicsKv.get(comicKvKey, "json") ?? {}
+  const comic = await comicDefinition.getComic()
+  comics[comicDefinition.name] = comic
+
+  await comicsKv.put(comicKvKey, JSON.stringify(comics))
+
+  return new Response(JSON.stringify(comic))
 }
 
 function isUpToDate(comicInKv: Comic, hours:number, minutes:number, jitterSecs: number = 0): boolean {

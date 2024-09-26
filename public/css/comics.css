@@ -15,7 +15,7 @@ body {
     text-align: center;
 }
 
-#loading {
+.loading {
     text-align: center;
     padding: 2em;
 }
@@ -92,4 +92,8 @@ iframe {
     margin: 1em;
     text-align: center;
     color: #aaa;
+}
+
+.reload {
+    float: right
 }
