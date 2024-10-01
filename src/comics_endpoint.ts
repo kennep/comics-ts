@@ -1,7 +1,11 @@
 import { comicDefinitions } from './comics'
-import { Comic } from './comic'
+import { Comic, age, hasErrors } from './comic'
 
 const comicKvKey = "comics.json"
+
+const SECOND=1000
+const MINUTE=60*SECOND
+const HOUR=60*MINUTE
 
 type Comics = {[key:string]: Comic}
 
@@ -33,11 +37,11 @@ export async function handleComicRequest(request: Request, comicName: string, co
   return new Response(JSON.stringify(comic))
 }
 
-function isUpToDate(comicInKv: Comic, hours:number, minutes:number, jitterSecs: number = 0): boolean {
-  if(comicInKv.data.errors != null && comicInKv.data.errors.length >= 0) {
-    return (new Date().getTime() - comicInKv.updated) < 3600000;
+function isUpToDate(comic: Comic, hours:number, minutes:number, jitterSecs: number = 0): boolean {
+  if(hasErrors(comic)) {
+    return age(comic) < 1*HOUR;
   }
-  return (new Date().getTime() - comicInKv.updated) < (hours*3600000 + minutes*60000+ Math.random() * jitterSecs * 1000);
+  return age(comic) < (hours*HOUR + minutes*MINUTE + Math.random() * jitterSecs * SECOND);
 }
 
 export async function handleScheduled(comicsKV: KVNamespace): Promise<void> {
@@ -61,8 +65,16 @@ async function getAndUpdateComics(comicsKv: KVNamespace, upToDateCheck: (c: Comi
     try {
       console.log(`Start loading comic: ${comicDefinition.name}`)
       const comic = await comicDefinition.getComic()
+      if(hasErrors(comic)) {
+        console.log(`Comic has errors:  ${comicDefinition.name}: ${comic.data.errors}`)
+        if(age(comicInKv) < 24*HOUR) {
+          console.log(`Not updating comic because of errors: ${comicDefinition.name}`)
+          return false;
+        }
+      }
+
       comics[comicDefinition.name] = comic
-      console.log(`Done loading comic: ${comicDefinition.name}`)
+      console.log(`Updated comic: ${comicDefinition.name}`)
       return true
     }
     catch(e: any) {

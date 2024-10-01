@@ -21,6 +21,16 @@ export type ComicData = {
 }
 
 
+export function age(comic: Comic): number
+{
+  return new Date().getTime() - comic.updated
+}
+
+export function hasErrors(comic: Comic): boolean
+{
+  return comic.data.errors != null && comic.data.errors.length > 0
+}
+
 function fixUrl(originUrl: string, url?: string): string | undefined {
   if (!url) return url
 
