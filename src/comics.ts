@@ -76,7 +76,7 @@ export var comicDefinitions: ComicDefinition[] = [
       return $('a.pencraft').attr('href') ?? "https://example.com/";
     },
     ($) => {
-      return singleImage($('picture img').attr('src')?.replace("w_120,", "w_800,"));
+      return singleImage($('picture img').attr('src')?.replace(/w_[0-9]+,h_[0-9]+,c_fill,/, "w_800"));
     }),
   new DagbladetComic("Gutta på gølvet"),
   new DagbladetComic("Rutetid"),
