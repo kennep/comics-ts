@@ -78,9 +78,9 @@ export var comicDefinitions: ComicDefinition[] = [
     ($) => {
       return singleImage($('picture img').attr('src')?.replace(/w_[0-9]+,h_[0-9]+,c_fill,/, "w_800,"));
     }),
-  new DagbladetComic("Gutta på gølvet"),
   new DagbladetComic("Rutetid"),
   new DagbladetComic("Hurtigmat"),
   new DagbladetComic("Flisespikkeri"),
   new DagbladetComic("Ting jeg gjorde"),
+  new DagbladetComic("Radio Gaga"),
 ]
