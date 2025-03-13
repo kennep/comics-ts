@@ -41,7 +41,7 @@
   "dependencies": {
     "@cloudflare/kv-asset-handler": "^0.3.4",
     "cheerio": "^1.0.0",
-    "dompurify": "^3.1.6",
+    "dompurify": "^3.2.4",
     "xss": "^1.0.15"
   }
 }
