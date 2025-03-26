@@ -52,7 +52,7 @@ export var comicDefinitions: ComicDefinition[] = [
     return {media: []};
   }),
   new NavigateParseComic('Loading Artist', 'https://loadingartist.com/', 
-    ($) => { return $('a.comic-thumb.wide').attr('href')! },
+    ($) => { return $('a.comic-thumb.wide').attr('href') },
     ($) => {
       return {
         media: [
@@ -73,10 +73,10 @@ export var comicDefinitions: ComicDefinition[] = [
   }),
   new NavigateParseComic('Work Chronicles', 'https://workchronicles.substack.com/archive', 
     ($) => {
-      return $('a.pencraft').attr('href') ?? "https://example.com/";
+      return $('a.pencraft[href^=https://workchronicles.substack.com/p/]').attr('href');
     },
     ($) => {
-      return singleImage($('picture img.sizing-normal').attr('src')?.replace(/w_[0-9]+,h_[0-9]+,c_fill,/, "w_800,"));
+      return singleImage($('article picture img').attr('src')?.replace(/w_[0-9]+,h_[0-9]+,c_fill,/, "w_800,"));
     }),
   /* Dagbladet comics are currently down
   new DagbladetComic("Rutetid"),

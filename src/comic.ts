@@ -18,6 +18,7 @@ export type ComicMedia = {
 export type ComicData = {
   media: ComicMedia[]
   errors?: string[]
+  intermediateUrls?: string[]
 }
 
 
@@ -71,6 +72,7 @@ function fixSrcSet(originUrl: string, srcSet: string): string {
 
 function fixup(originUrl: string, cd: ComicData): ComicData {
   return {
+    intermediateUrls: cd.intermediateUrls,
     errors: cd.errors,
     media: cd.media.map(m => {
       return {
@@ -93,7 +95,7 @@ function validate(comicData: ComicData) {
   if (!comicData.errors) {
     comicData.errors = []
   }
-  if (comicData.media.length == 0) {
+  if (comicData.media.length == 0 && comicData.errors.length == 0) {
     comicData.errors.push('Could not load comic')
   }
 }
@@ -209,9 +211,9 @@ export class ParseComic extends LoadedUrlComic {
 }
 
 export class NavigateParseComic extends ParseComic {
-  targetSelector: (body: CheerioAPI) => string;
+  targetSelector: (body: CheerioAPI) => string | undefined;
 
-  constructor(name: string, url: string, targetSelector: (body: CheerioAPI) => string, comicFactory: ParseComicFactory) {
+  constructor(name: string, url: string, targetSelector: (body: CheerioAPI) => string | undefined, comicFactory: ParseComicFactory) {
     super(name, url, comicFactory);
     this.targetSelector = targetSelector;
   }
@@ -231,21 +233,39 @@ export class NavigateParseComic extends ParseComic {
 
     const navigatedUrl = fixUrl(linkUrl, targetUrl)!;
 
-    return await super.loadComicData(navigatedUrl);
+    var comicData = await super.loadComicData(navigatedUrl);
+    comicData.intermediateUrls ??= [];
+    comicData.intermediateUrls.push(navigatedUrl);
+    return comicData;
   }
 }
 
 
 export function singleImage(href: string | undefined):  ComicData {
+  if(!href)
+  {
+    return error("No media found")
+  }
   return {
     media: [{type: 'image', href: href}]
   };
 }
 
 export function singleImageWithTitle(href: string | undefined, title: string | undefined):  ComicData {
+  if(!href && !title)
+  {
+    return error("No media found")
+  }
   return {
     media: [{type: 'image', href: href}, {type: 'text', content: title}]
   };
+}
+
+function error(message: string): ComicData {
+  return {
+    media: [],
+    errors: [ message ]
+  }
 }
 
 // These functions are internal, and are only exported for unit testing

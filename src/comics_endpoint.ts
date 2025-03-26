@@ -30,6 +30,7 @@ export async function handleComicRequest(request: Request, comicName: string, co
 
   const comics: Comics = await comicsKv.get(comicKvKey, "json") ?? {}
   const comic = await comicDefinition.getComic()
+  dumpComic(comic)
   comics[comicDefinition.name] = comic
 
   await comicsKv.put(comicKvKey, JSON.stringify(comics))
@@ -65,9 +66,10 @@ async function getAndUpdateComics(comicsKv: KVNamespace, upToDateCheck: (c: Comi
     try {
       console.log(`Start loading comic: ${comicDefinition.name}`)
       const comic = await comicDefinition.getComic()
+      dumpComic(comic)
       if(hasErrors(comic)) {
         console.log(`Comic has errors:  ${comicDefinition.name}: ${comic.data.errors}`)
-        if(age(comicInKv) < 24*HOUR) {
+        if(comicInKv != null && age(comicInKv) < 24*HOUR) {
           console.log(`Not updating comic because of errors: ${comicDefinition.name}`)
           return false;
         }
@@ -92,4 +94,23 @@ async function getAndUpdateComics(comicsKv: KVNamespace, upToDateCheck: (c: Comi
   }
 
   return comics
+}
+
+function dumpComic(comic: Comic)
+{
+  console.log(`${comic.name} (${new Date(comic.updated).toISOString()})`);
+  console.log('  > ' + comic.linkUrl);
+
+  for(const url of comic.data.intermediateUrls ?? []) {
+    console.log('  > ' + url);
+  }
+
+  for(const media of comic.data.media) {
+      console.log('  + ' + JSON.stringify(media));
+  }
+
+  for(const error of comic.data.errors ?? []) {
+      console.log(' ! ' + error);
+  }
+  
 }

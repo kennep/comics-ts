@@ -1,4 +1,6 @@
 import { exportedForTesting } from '../src/comic'
+import { CheerioAPI, load } from 'cheerio'
+
 
 const fixSrcSet = exportedForTesting.fixSrcSet;
 const fixupHtml = exportedForTesting.fixupHtml;
