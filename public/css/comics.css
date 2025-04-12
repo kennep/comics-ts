@@ -107,14 +107,14 @@ ul.othercomicslist {
 }
 
 ul.othercomicslist li {
-    border: 1px solid #00006a;
+    border: 1px solid #2d2d46;
     margin: 0.5em;
     border-radius: 5px;
-    background-color: #3636d1;
+    background-color: #525281;
     padding: 0.5em;
 }
 
 ul.othercomicslist a {
     display: block;
-    color: white
+    color: white;
 }
