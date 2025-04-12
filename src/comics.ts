@@ -65,9 +65,9 @@ export var comicDefinitions: ComicDefinition[] = [
     // There's little to go by in the structure to identify the correct image, but we try our best...
     return singleImage($('div.entry-content img', $('article.tag-webcomic').first()).last().attr('data-orig-file')); 
   }),
-  new ParseComic('Poorly Drawn Lines', 'https://poorlydrawnlines.com/', ($) => {
-    return singleImage($('div.entry-content img').attr('data-src')); 
-  }),
+  //new ParseComic('Poorly Drawn Lines', 'https://poorlydrawnlines.com/', ($) => {
+  //  return singleImage($('div.entry-content img').attr('data-src')); 
+  //}),
   new ParseComic('ToonHole', 'https://toonhole.com/', ($) => {
     return singleImage($('img.wp-post-image').attr('src')); 
   }),

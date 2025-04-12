@@ -97,3 +97,24 @@ iframe {
 .reload {
     float: right
 }
+
+ul.othercomicslist {
+    font-size: 1.2rem;
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+    text-align: center;
+}
+
+ul.othercomicslist li {
+    border: 1px solid #00006a;
+    margin: 0.5em;
+    border-radius: 5px;
+    background-color: #3636d1;
+    padding: 0.5em;
+}
+
+ul.othercomicslist a {
+    display: block;
+    color: white
+}
