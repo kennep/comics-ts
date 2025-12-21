@@ -68,9 +68,10 @@ export var comicDefinitions: ComicDefinition[] = [
   //new ParseComic('Poorly Drawn Lines', 'https://poorlydrawnlines.com/', ($) => {
   //  return singleImage($('div.entry-content img').attr('data-src')); 
   //}),
-  new ParseComic('ToonHole', 'https://toonhole.com/', ($) => {
-    return singleImage($('img.wp-post-image').attr('src')); 
-  }),
+  // ToonHole returns 403 Forbidden when we try to fetch it server-side
+  ///new ParseComic('ToonHole', 'https://toonhole.com/', ($) => {
+  //  return singleImage($('img.wp-post-image').attr('src')); 
+  //}),
   new NavigateParseComic('Work Chronicles', 'https://workchronicles.substack.com/archive', 
     ($) => {
       return $('a.pencraft[href^=https://workchronicles.substack.com/p/]').attr('href');
