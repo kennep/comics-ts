@@ -72,9 +72,9 @@ export var comicDefinitions: ComicDefinition[] = [
   ///new ParseComic('ToonHole', 'https://toonhole.com/', ($) => {
   //  return singleImage($('img.wp-post-image').attr('src')); 
   //}),
-  new NavigateParseComic('Work Chronicles', 'https://workchronicles.substack.com/archive', 
+  new NavigateParseComic('Work Chronicles', 'https://www.workchronicles.com/archive', 
     ($) => {
-      return $('a.pencraft[href^=https://workchronicles.substack.com/p/]').attr('href');
+      return $('a.pencraft[href^=https://www.workchronicles.com/p/]').attr('href');
     },
     ($) => {
       return singleImage($('article picture img').attr('src')?.replace(/w_[0-9]+,h_[0-9]+,c_fill,/, "w_800,"));
