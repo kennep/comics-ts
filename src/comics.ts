@@ -20,7 +20,7 @@ export var comicDefinitions: ComicDefinition[] = [
     );
   }),
   new ParseComic('Spinnerette', 'https://www.spinnyverse.com', ($) => {
-    return singleImage($('img#cc-comic').attr('src'));
+    return singleImage($('div.comic-holder figure img').attr('src'));
   }),
   new ParseComic('Cassiopeia Quinn', 'https://www.cassiopeiaquinn.com/', ($) => {
     return singleImage($('img#cc-comic').attr('src'));
