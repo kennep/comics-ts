@@ -11,6 +11,9 @@ jobs:
     name: Deploy
     steps:
       - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 26
       - name: Publish
         run: |
           npm install
