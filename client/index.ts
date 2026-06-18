@@ -33,12 +33,12 @@ window.addEventListener('load', async function () {
         let comics = await comicsResponse.json()
         hideLoad()
         updateLocalComicsTimestamp(comics)
-        comics.sort((a, b) => b.firstSeen - a.firstSeen)
-        comics.forEach((comic) => {
+        comics.sort((a: Comic, b: Comic) => (b.firstSeen ?? 0) - (a.firstSeen ?? 0))
+        comics.forEach((comic: Comic) => {
             var comicElement = createComicElement(comic)
-            document.getElementById('comics').appendChild(comicElement)
+            document.getElementById('comics')!.appendChild(comicElement)
         })
-    } catch (e) {
+    } catch (e: any) {
         hideLoad()
         emitError('Error', e.toString())
     }
@@ -69,26 +69,26 @@ function createComicElement(comic: Comic)
         if (media.type == 'image') {
             const p = document.createElement('p');
             const img = document.createElement('img');
-            img.setAttribute('src', media.href);
+            img.setAttribute('src', media.href!);
             p.appendChild(img);
             comicElement.appendChild(p);
         }
 
         if (media.type == 'text') {
             let p = document.createElement('p');
-            p.innerText = media.content;
+            p.innerText = media.content!;
             comicElement.appendChild(p);
         }
 
         if (media.type == 'title') {
             let h = document.createElement('h3');
-            h.innerText = media.content;
+            h.innerText = media.content!;
             comicElement.appendChild(h);
         }
 
         if (media.type == 'html') {
             let p = document.createElement('p');
-            p.innerHTML = DOMPurify.sanitize(media.content);
+            p.innerHTML = DOMPurify.sanitize(media.content!);
             comicElement.appendChild(p);
         }
 
@@ -128,7 +128,7 @@ function addReloadLink(e: Element, comic: Comic, enabled: boolean = true) {
 async function reload(comic: Comic) : Promise<boolean> {
     const id = nameToId(comic.name)
     const elementToReplace = document.getElementById(id)
-    if(!elementToReplace) return
+    if(!elementToReplace) return false;
 
     let placeholder = document.createElement('article')
     placeholder.id = id;
@@ -147,7 +147,7 @@ async function reload(comic: Comic) : Promise<boolean> {
 
     elementToReplace.replaceWith(placeholder)
 
-    let comicElement: Element = null
+    let comicElement: Element | null = null
     const comicResponse = await fetch('/comics/' + encodeURIComponent(comic.name))
     if (comicResponse.status != 200) {
         comicElement = createErrorElement(comic.name, `HTTP ${comicResponse.status}`, comic.linkUrl, id, head => addReloadLink(head, comic))
@@ -161,7 +161,7 @@ async function reload(comic: Comic) : Promise<boolean> {
 }
 
 function hideLoad() {
-    document.getElementById('loading').style.display = 'none'
+    document.getElementById('loading')!.style.display = 'none'
 }
 
 function createErrorElement(heading: string, content: string, link?: string, id?: string, headModifier?: (head: Element) => void) : Element {
@@ -200,10 +200,10 @@ function toggleZoom(event: MouseEvent) {
 }
 
 function updateLocalComicsTimestamp(comics: Array<Comic>) {
-    let currentComicsTimestamps = JSON.parse(
+    let currentComicsTimestamps: Record<string, number> = JSON.parse(
         localStorage.getItem('comicTimestamps') ?? '{}',
     )
-    let newComicsTimestamps = {}
+    let newComicsTimestamps: Record<string, number> = {}
     comics.forEach((comic) => {
         let key = JSON.stringify(comic.data.media);
         comic.firstSeen = currentComicsTimestamps[key] ?? Date.now()
@@ -215,5 +215,8 @@ function updateLocalComicsTimestamp(comics: Array<Comic>) {
 
 function setVersion()
 {
-    document.getElementById("version").innerText = __COMMIT_HASH__;
+    const versionElement = document.getElementById("version")
+    if (versionElement) {
+        versionElement.innerText = __COMMIT_HASH__;
+    }
 }
