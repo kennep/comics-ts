@@ -11,7 +11,7 @@ class DagbladetComic extends ParseComic {
 export var comicDefinitions: ComicDefinition[] = [
   new DirectUrlComic('Lunch', 'https://e24.no', (_) => {
     const now = new Date().toISOString()
-    return 'https://api.e24.no/content/v1/comics/' + now.substring(0, 10)
+    return 'https://api.strandcomics.no/striper/e24/lunch/' + now.substring(0, 10)
   }),
   new ParseComic('XKCD', 'https://www.xkcd.com/', ($) => {
     return singleImageWithTitle(
@@ -23,7 +23,10 @@ export var comicDefinitions: ComicDefinition[] = [
     return singleImage($('div.comic-holder figure img').attr('src'));
   }),
   new ParseComic('Cassiopeia Quinn', 'https://www.cassiopeiaquinn.com/', ($) => {
-    return singleImage($('img#cc-comic').attr('src'));
+    return singleImageWithTitle(
+      $('div.comic-holder img.attachment-full').attr('src'),
+      $('div.comic-holder img.attachment-full').attr('title')
+    );
   }),
   new ParseComic('Ctrl-Alt-Del', 'https://cad-comic.com/', ($) => {
     return singleImage($('img.comic-display').attr('src'));
