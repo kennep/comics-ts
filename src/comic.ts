@@ -163,17 +163,19 @@ export type UrlLoaderFactory = (body: string) => ComicData
 
 export class LoadedUrlComic extends ComicDefinition {
   comicFactory: UrlLoaderFactory
+  acceptedStatuses: number[]
 
-  constructor(name: string, url: string, comicFactory: UrlLoaderFactory) {
+  constructor(name: string, url: string, comicFactory: UrlLoaderFactory, acceptedStatuses: number[] = [200]) {
     super(name, url)
     this.comicFactory = comicFactory
+    this.acceptedStatuses = acceptedStatuses
   }
 
   async loadComicData(linkUrl: string): Promise<ComicData> {
     const response = await this.fetchWithTimeout(linkUrl)
 
     const body = await response.text()
-    if (response.status != 200) {
+    if (!this.acceptedStatuses.includes(response.status)) {
       throw new Error(`Failed getting ${this.name}: HTTP ${response.status}: ${body}`)
     }
 
@@ -202,11 +204,11 @@ export class LoadedUrlComic extends ComicDefinition {
 export type ParseComicFactory = (body: CheerioAPI, bodyText: string) => ComicData
 
 export class ParseComic extends LoadedUrlComic {
-  constructor(name: string, url: string, comicFactory: ParseComicFactory) {
+  constructor(name: string, url: string, comicFactory: ParseComicFactory, acceptedStatuses: number[] = [200]) {
     super(name, url, (body) => {
       const doc = load(body, {xmlMode: false, scriptingEnabled: false})
       return comicFactory(doc, body)
-    })
+    }, acceptedStatuses)
   }
 }
 

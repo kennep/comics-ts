@@ -31,6 +31,7 @@ export var comicDefinitions: ComicDefinition[] = [
   new ParseComic('Ctrl-Alt-Del', 'https://cad-comic.com/', ($) => {
     return singleImage($('img.comic-display').attr('src'));
   }),
+  // SMBC serves valid comic HTML with HTTP 500; still parse and validate its media.
   new ParseComic('SMBC', 'https://www.smbc-comics.com/', ($) => {
     return {
       media: [
@@ -39,7 +40,7 @@ export var comicDefinitions: ComicDefinition[] = [
         {type: 'text', content: $('img#cc-comic').attr('title')}
       ]
     }
-  }),
+  }, [200, 500]),
   new ParseComic('MonkeyUser', 'https://www.monkeyuser.com/?dir=last', ($, body) => {
     const img = $('.content img').attr('src');
     if (img) {
